@@ -54,7 +54,7 @@ model Thread {
 model Message {
   id       String      @id @default(auto()) @map("_id") @db.ObjectId
   type     MessageType
-  recipent String
+  recipient String
   senderId String // alaways a user will send
   body     String
   
