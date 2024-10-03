@@ -1,4 +1,10 @@
-import { Message, PrismaClient, MessageType, User } from "@prisma/client";
+import {
+  Message,
+  PrismaClient,
+  MessageType,
+  User,
+  Prisma,
+} from "@prisma/client";
 import { PrismaService } from "../../plugins/databases/prisma";
 import { UserService } from "../users/service";
 import { PrismaCrudMixin } from "../../plugins/databases/prism-crud";
@@ -20,8 +26,16 @@ export class MessageService extends PrismaCrudMixin<Message> {
     //user sending message to a user. cant use getMessageFor, recipient=suphal@gmail.com sender=sourav@gmail.com
     // reason, getting only messages for recipient will bring sourav@gmail.com, sayak@gmail.com ...
     // thats why bringing messages only dedicated to sourav@gmail.com and suphal@gmail.com
-    return this.paginate<Partial<Message>>(
-      { senderId, recipient },
+    return this.paginate<Partial<Prisma.MessageWhereInput>>(
+      {
+        OR: [
+          { senderId, recipient },
+          {
+            senderId: recipient,
+            recipient: senderId,
+          },
+        ],
+      },
       { take, skip },
       [{ field: "createdAt", direction: "desc" }],
     );

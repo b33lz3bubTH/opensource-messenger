@@ -3,26 +3,32 @@ import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resources/users/resolvers";
+import { MessageResolver } from "./resources/messages/resolvers";
 
 async function bootstrap() {
-  // Build the GraphQL schema
   const schema = await buildSchema({
-    resolvers: [UserResolver],
+    resolvers: [UserResolver, MessageResolver],
   });
 
-  // Initialize the Apollo Server
-  const server = new ApolloServer({ schema });
+  const server = new ApolloServer({
+    schema,
+    formatError: (e) => {
+      console.error(e);
+      return {
+        message: e.message,
+        code: e.extensions?.exception?.code || 500,
+        locations: e.locations,
+        path: e.path,
+      };
+    },
+  });
 
-  // Start the Apollo Server before applying middleware
   await server.start();
 
-  // Create the Express app
   const app = express();
 
-  // Apply Apollo GraphQL middleware to the Express app
   server.applyMiddleware({ app });
 
-  // Start the Express server
   app.listen({ port: 4000 }, () =>
     console.log(`Server ready at http://localhost:4000${server.graphqlPath}`),
   );

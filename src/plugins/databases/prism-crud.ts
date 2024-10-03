@@ -15,7 +15,7 @@ export class PrismaCrudMixin<ModelType> {
 
   constructor() {}
 
-  setModel(model: any) {
+  protected setModel(model: any) {
     this.model = model;
   }
 
