@@ -17,6 +17,19 @@ enum MessageType {
   direct
   group
   thread
+  sysinfo
+}
+
+enum MessageMetaType {
+     thread_created
+     user_joined
+     group_updated
+}
+
+type MessageMeta {
+     messageMetaType MessageMetaType
+     refId String
+     title String
 }
 
 model User {
@@ -57,6 +70,7 @@ model Message {
   recipient String
   senderId String // alaways a user will send
   body     String
+  meta     MessageMeta?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

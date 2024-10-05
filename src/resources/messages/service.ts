@@ -4,6 +4,7 @@ import {
   MessageType,
   User,
   Prisma,
+  MessageMeta,
 } from "@prisma/client";
 import { PrismaService } from "../../plugins/databases/prisma";
 import { UserService } from "../users/service";
@@ -54,17 +55,19 @@ export class MessageService extends PrismaCrudMixin<Message> {
     senderUsername: string,
     recipient: string,
     recipientType: MessageType,
+    meta?: MessageMeta
   ) {
     const sender = await this.userService.get<Partial<User>>({
       username: senderUsername,
     });
 
-    return this.db.message.create({
+    return (this.model as typeof this.db.message).create({
       data: {
         type: recipientType,
         recipient,
         senderId: sender.id,
         body: message,
+        meta
       },
     });
   }

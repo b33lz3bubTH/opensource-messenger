@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 interface PaginationArgs {
   skip?: number;
   take?: number;
@@ -11,7 +13,7 @@ interface OrderBy<Fields> {
 }
 
 export class PrismaCrudMixin<ModelType> {
-  private model: any;
+  protected model: any;
 
   constructor() {}
 

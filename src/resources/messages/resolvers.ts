@@ -1,4 +1,9 @@
-import { Message, MessageType } from "@prisma/client";
+import {
+  Message,
+  MessageType,
+  MessageMeta,
+  MessageMetaType,
+} from "@prisma/client";
 import {
   Resolver,
   Query,
@@ -8,6 +13,7 @@ import {
   Field,
   registerEnumType,
   Int,
+  InputType,
 } from "type-graphql";
 
 import { MessageService } from "./service";
@@ -16,6 +22,36 @@ registerEnumType(MessageType, {
   name: "MessageType",
   description: "it is direct or group, or thread",
 });
+
+registerEnumType(MessageMetaType, {
+  name: "MessageMetaType",
+  description:
+    "meta is defines the type of polymorphic message, when meta is added, what kind of message is it notificational message or reference.",
+});
+
+@InputType()
+class InputGqlMessageMeta {
+  @Field()
+  refId: string;
+
+  @Field()
+  title: string;
+
+  @Field(() => MessageMetaType)
+  messageMetaType: MessageMetaType;
+}
+
+@ObjectType()
+class GqlMessageMeta {
+  @Field()
+  refId: string;
+
+  @Field()
+  title: string;
+
+  @Field(() => MessageMetaType)
+  messageMetaType: MessageMetaType;
+}
 
 @ObjectType()
 class GqlMessageType {
@@ -33,6 +69,12 @@ class GqlMessageType {
 
   @Field()
   body: string;
+
+  @Field(() => GqlMessageMeta, { nullable: true })
+  meta: GqlMessageMeta;
+
+  @Field(() => Date)
+  createdAt: Date;
 }
 
 @ObjectType()
@@ -54,8 +96,16 @@ export class MessageResolver {
     @Arg("recipent") recipient: string,
     @Arg("type", () => MessageType) type: MessageType,
     @Arg("messageBody") message: string,
-  ): Promise<Message> {
-    return this.messageService.sendMessage(message, username, recipient, type);
+    @Arg("meta", () => InputGqlMessageMeta, { nullable: true })
+    meta?: MessageMeta,
+  ): Promise<GqlMessageType> {
+    return this.messageService.sendMessage(
+      message,
+      username,
+      recipient,
+      type,
+      meta,
+    );
   }
 
   @Query(() => PaginatedMessageResponse)
@@ -71,5 +121,14 @@ export class MessageResolver {
       take,
       skip,
     );
+  }
+  // getMessagesFor Query
+  @Query(() => PaginatedMessageResponse)
+  async getMessagesFor(
+    @Arg("recipient") recipient: string,
+    @Arg("take", () => Int, { defaultValue: 10 }) take: number,
+    @Arg("skip", () => Int, { defaultValue: 0 }) skip: number,
+  ): Promise<PaginatedMessageResponse> {
+    return this.messageService.getMessagesFor(recipient, take, skip);
   }
 }

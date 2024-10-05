@@ -36,7 +36,6 @@ export class UserResolver {
     return this.userService.getUser(username);
   }
 
-
   @Mutation(() => UserType)
   async signUp(
     @Arg('username') username: string,
