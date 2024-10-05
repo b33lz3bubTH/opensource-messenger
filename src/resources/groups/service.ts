@@ -10,8 +10,13 @@ export class GroupUsersService extends PrismaCrudMixin<GroupUser> {
     this.setModel(this.db.groupUser);
   }
 
-  async addGroupUser(userId: string, group: string) {
-    return this.create<Prisma.GroupUserCreateInput>({ userId, groupId: group });
+  async addGroupUser(userId: string, groupId: string) {
+    const userAlreadyExists = await this.get<Partial<GroupUser>>({
+      userId,
+      groupId,
+    });
+    if (userAlreadyExists) throw new Error("user already exists");
+    return this.create<Prisma.GroupUserCreateInput>({ userId, groupId });
   }
 
   async findUsersGroup(userId: string) {
@@ -61,8 +66,6 @@ export class GroupsService extends PrismaCrudMixin<Group> {
       user.id,
       group.id,
     );
-
-    console.log(`new group created : ${user.username} created ${group.name}`);
 
     const groupDefaulSysFirstMessage = await this.messageService.sendMessage(
       `new group created by ${user.username}`,

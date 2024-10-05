@@ -4,10 +4,11 @@ import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resources/users/resolvers";
 import { MessageResolver } from "./resources/messages/resolvers";
+import { GroupsResolver } from './resources/groups/resolvers';
 
 async function bootstrap() {
   const schema = await buildSchema({
-    resolvers: [UserResolver, MessageResolver],
+    resolvers: [UserResolver, MessageResolver, GroupsResolver],
   });
 
   const server = new ApolloServer({

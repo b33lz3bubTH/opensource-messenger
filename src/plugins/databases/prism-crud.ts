@@ -1,5 +1,3 @@
-import { Prisma } from "@prisma/client";
-
 interface PaginationArgs {
   skip?: number;
   take?: number;
@@ -23,7 +21,7 @@ export class PrismaCrudMixin<ModelType> {
 
   // Get a single record with optional filters
   async get<Filter>(filter: Filter): Promise<ModelType | null> {
-    return this.model.findUniqueOrThrow({
+    return this.model.findFirst({
       where: filter,
     });
   }
