@@ -9,6 +9,7 @@ import {
 import { PrismaService } from "../../plugins/databases/prisma";
 import { UserService } from "../users/service";
 import { PrismaCrudMixin } from "../../plugins/databases/prism-crud";
+import { events, eventEmitter as messageEmitter } from "../../plugins/web-sock/events-stream"
 
 export class MessageService extends PrismaCrudMixin<Message> {
   private userService: UserService = new UserService();
@@ -61,7 +62,7 @@ export class MessageService extends PrismaCrudMixin<Message> {
       username: senderUsername,
     });
 
-    return (this.model as typeof this.db.message).create({
+    const newMessage = await (this.model as typeof this.db.message).create({
       data: {
         type: recipientType,
         recipient,
@@ -70,5 +71,9 @@ export class MessageService extends PrismaCrudMixin<Message> {
         meta
       },
     });
+
+    messageEmitter.emit(events.notifyUser, recipient, newMessage);
+    
+    return newMessage;
   }
 }

@@ -2,6 +2,7 @@ import "reflect-metadata";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
+import { MessagesWebsocketServer } from "./plugins/web-sock/socket-controller";
 import { UserResolver } from "./resources/users/resolvers";
 import { MessageResolver } from "./resources/messages/resolvers";
 import { GroupsResolver } from './resources/groups/resolvers';
@@ -30,9 +31,10 @@ async function bootstrap() {
 
   server.applyMiddleware({ app });
 
-  app.listen({ port: 4000 }, () =>
+  const httpServer = app.listen({ port: 4000 }, () =>
     console.log(`Server ready at http://localhost:4000${server.graphqlPath}`),
   );
+  const wss = new MessagesWebsocketServer(httpServer);
 }
 
 // Call the bootstrap function to run the server

@@ -1,3 +1,5 @@
+// to make it infinitely scalable, need a separate api
+
 abstract class MessageNotificationSystem {
   constructor() {}
 

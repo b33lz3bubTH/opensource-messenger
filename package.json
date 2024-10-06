@@ -24,6 +24,7 @@
     "class-validator": "^0.14.1",
     "express": "^4.21.0",
     "reflect-metadata": "^0.2.2",
-    "typegraphql-prisma": "^0.28.0"
+    "typegraphql-prisma": "^0.28.0",
+    "ws": "^8.18.0"
   }
 }

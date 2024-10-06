@@ -1,11 +1,15 @@
-import { Group, GroupUser, Prisma, PrismaClient } from "@prisma/client";
+import { Group, GroupUser, Prisma, PrismaClient, User } from "@prisma/client";
 import { PrismaCrudMixin } from "../../plugins/databases/prism-crud";
 import { PrismaService } from "../../plugins/databases/prisma";
 import { MessageService } from "../messages/service";
 import { UserService } from "../users/service";
 
 export class GroupUsersService extends PrismaCrudMixin<GroupUser> {
-  constructor(private db: PrismaClient = PrismaService.getInstance()) {
+  constructor(
+    private db: PrismaClient = PrismaService.getInstance(),
+    private messageService = new MessageService(),
+    private userService = new UserService(),
+  ) {
     super();
     this.setModel(this.db.groupUser);
   }
@@ -16,7 +20,26 @@ export class GroupUsersService extends PrismaCrudMixin<GroupUser> {
       groupId,
     });
     if (userAlreadyExists) throw new Error("user already exists");
-    return this.create<Prisma.GroupUserCreateInput>({ userId, groupId });
+    const newUser = await this.create<Prisma.GroupUserCreateInput>({
+      userId,
+      groupId,
+    });
+    const user = await this.userService.get<Partial<User>>({
+      id: userId,
+    });
+
+    const groupDefaultMessage = await this.messageService.sendMessage(
+      `${user.username} user joined`,
+      user.username,
+      groupId,
+      "sysinfo",
+      {
+        refId: userId,
+        title: `@${user.username} appeared, say Hi everyone`,
+        messageMetaType: "user_joined",
+      },
+    );
+    return newUser;
   }
 
   async findUsersGroup(userId: string) {
