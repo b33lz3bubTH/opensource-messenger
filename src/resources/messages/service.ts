@@ -8,7 +8,7 @@ import {
 } from "@prisma/client";
 import { PrismaService } from "../../plugins/databases/prisma";
 import { UserService } from "../users/service";
-import { PrismaCrudMixin } from "../../plugins/databases/prism-crud";
+import { PrismaCrudMixin } from "../../plugins/databases/prisma-crud";
 import {
   events,
   eventEmitter as messageEmitter,

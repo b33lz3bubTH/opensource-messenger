@@ -1,4 +1,10 @@
-# opensource-messenger
+```
+ ▗▄▖ ▗▄▄▖ ▗▄▄▄▖▗▖  ▗▖    ▗▖  ▗▖▗▄▄▄▖ ▗▄▄▖ ▗▄▄▖▗▄▄▄▖▗▖  ▗▖ ▗▄▄▖▗▄▄▄▖▗▄▄▖ 
+▐▌ ▐▌▐▌ ▐▌▐▌   ▐▛▚▖▐▌    ▐▛▚▞▜▌▐▌   ▐▌   ▐▌   ▐▌   ▐▛▚▖▐▌▐▌   ▐▌   ▐▌ ▐▌
+▐▌ ▐▌▐▛▀▘ ▐▛▀▀▘▐▌ ▝▜▌    ▐▌  ▐▌▐▛▀▀▘ ▝▀▚▖ ▝▀▚▖▐▛▀▀▘▐▌ ▝▜▌▐▌▝▜▌▐▛▀▀▘▐▛▀▚▖
+▝▚▄▞▘▐▌   ▐▙▄▄▖▐▌  ▐▌    ▐▌  ▐▌▐▙▄▄▖▗▄▄▞▘▗▄▄▞▘▐▙▄▄▖▐▌  ▐▌▝▚▄▞▘▐▙▄▄▖▐▌ ▐▌
+                                                                        
+ ```
 
 
 
@@ -13,5 +19,5 @@
 [x] add user to group
 [x] user to group message
 [x] groups message fetch
-[] websocket server for user to group message notification
+[x] websocket server for user to group message notification
 [x] websocket server for user to user message notification

@@ -1,5 +1,5 @@
 import { Group, GroupUser, Prisma, PrismaClient, User } from "@prisma/client";
-import { PrismaCrudMixin } from "../../plugins/databases/prism-crud";
+import { PrismaCrudMixin } from "../../plugins/databases/prisma-crud";
 import { PrismaService } from "../../plugins/databases/prisma";
 import { MessageService } from "../messages/service";
 import { UserService } from "../users/service";
@@ -73,6 +73,9 @@ export class GroupsService extends PrismaCrudMixin<Group> {
           in: groupIds,
         },
       },
+      orderBy: [
+        { createdAt: 'desc' }
+      ]
     });
     return groups;
   }

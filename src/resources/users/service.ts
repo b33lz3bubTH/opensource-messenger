@@ -1,6 +1,6 @@
 import { PrismaClient, User } from "@prisma/client";
 import { PrismaService } from "../../plugins/databases/prisma";
-import { PrismaCrudMixin } from "../../plugins/databases/prism-crud";
+import { PrismaCrudMixin } from "../../plugins/databases/prisma-crud";
 import { CryptoService } from "../../plugins/utils/crypto-service";
 
 export class UserService extends PrismaCrudMixin<User> {
@@ -21,6 +21,17 @@ export class UserService extends PrismaCrudMixin<User> {
         email
       }
     });
+  }
+
+  async signin(username: string, password: string){
+    const user = await this.get<Partial<User>>({
+      username
+    });
+    if(!user) throw new Error(`error login`);
+
+    const decryptedPassword = this.cryptoService.decrypt(user.password);
+    if(decryptedPassword === password) return user;
+    throw new Error(`error login`);
   }
   
   async getUser(username: string) {

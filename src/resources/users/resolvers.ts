@@ -32,8 +32,16 @@ export class UserResolver {
   private userService: UserService = new UserService();
 
   @Query(() => UserType)
-  async users(@Arg("username") username: string): Promise<User> {
+  async users(@Arg("username") username: string): Promise<UserType> {
     return this.userService.getUser(username);
+  }
+
+  @Query(() => UserType)
+  async signIn(
+    @Arg("username") username: string,
+    @Arg("password") password: string
+  ): Promise<UserType>{
+    return this.userService.signin(username, password);
   }
 
   @Mutation(() => UserType)
@@ -41,7 +49,7 @@ export class UserResolver {
     @Arg('username') username: string,
     @Arg('email') email: string,
     @Arg('password') password: string
-  ): Promise<User> {
+  ): Promise<UserType> {
     return this.userService.signup(username, password, email);
   }
 }

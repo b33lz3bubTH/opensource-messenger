@@ -1,11 +1,10 @@
 import {
   Field,
   ObjectType,
-  ID,
   Resolver,
   Mutation,
   Arg,
-  Query,
+  Query
 } from "type-graphql";
 
 import { GroupsService, GroupUsersService } from "./service";
