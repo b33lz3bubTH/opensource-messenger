@@ -9,7 +9,9 @@
 ### todo:
 [x] user to user message
 [x] user sign Up
-[] group create
-[] add user to group
-[] user to group message
-[] groups message fetch
+[x] group create
+[x] add user to group
+[x] user to group message
+[x] groups message fetch
+[] websocket server for user to group message notification
+[x] websocket server for user to user message notification

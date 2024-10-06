@@ -9,7 +9,10 @@ import {
 import { PrismaService } from "../../plugins/databases/prisma";
 import { UserService } from "../users/service";
 import { PrismaCrudMixin } from "../../plugins/databases/prism-crud";
-import { events, eventEmitter as messageEmitter } from "../../plugins/web-sock/events-stream"
+import {
+  events,
+  eventEmitter as messageEmitter,
+} from "../../plugins/web-sock/events-stream";
 
 export class MessageService extends PrismaCrudMixin<Message> {
   private userService: UserService = new UserService();
@@ -56,7 +59,7 @@ export class MessageService extends PrismaCrudMixin<Message> {
     senderUsername: string,
     recipient: string,
     recipientType: MessageType,
-    meta?: MessageMeta
+    meta?: MessageMeta,
   ) {
     const sender = await this.userService.get<Partial<User>>({
       username: senderUsername,
@@ -68,12 +71,27 @@ export class MessageService extends PrismaCrudMixin<Message> {
         recipient,
         senderId: sender.id,
         body: message,
-        meta
+        meta,
       },
     });
 
-    messageEmitter.emit(events.notifyUser, recipient, newMessage);
-    
+    switch (recipientType) {
+      case "direct":
+        messageEmitter.emit(events.notifyUser, recipient, newMessage);
+        break;
+      case "group":
+        console.log(`sending group message`);
+        messageEmitter.emit(
+          events.broadcastGroupMessage,
+          recipient,
+          newMessage,
+          sender.id,
+        );
+        break;
+      default:
+        console.log(`cannot notify ${recipientType} messages.`);
+    }
+
     return newMessage;
   }
 }

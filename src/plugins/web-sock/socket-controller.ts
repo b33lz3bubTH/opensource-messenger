@@ -1,4 +1,3 @@
-// src/server.ts
 import WebSocket, { Server } from "ws";
 import { UserRoom } from "./users-room";
 import { GroupRoom } from "./groups-room";
@@ -20,30 +19,14 @@ export class MessagesWebsocketServer {
       const urlParts = req.url?.split("/");
       if (!urlParts) return;
 
-      const type = urlParts[1]; // e.g., 'users' or 'group'
-      const id = urlParts[2]; // e.g., userId or groupId
+      const type: string = urlParts[1]; // e.g., 'users' or 'group'
+      const id: string = urlParts[2]; // e.g., userId or groupId__userId1, groupId__userId2....
 
       if (type === "users") {
         this.userRoom.join(id, ws);
-        console.log(`User ${id} joined.`);
       } else if (type === "group") {
         this.joinGroup(id, ws);
-        console.log(`User joined group ${id}.`);
       }
-
-      // Listen for messages from this connection
-      ws.on("message", (message: string) => {
-        const { action, userId, groupId, data } = JSON.parse(message);
-
-        switch (action) {
-          case "sendGroupMessage":
-            this.sendGroupMessage(groupId, userId, data);
-            break;
-
-          default:
-            console.log("Unknown action:", action);
-        }
-      });
 
       ws.on("close", () => {
         // Handle user or group disconnection if needed
@@ -60,40 +43,32 @@ export class MessagesWebsocketServer {
     // Listen for group notifications
     eventEmitter.on(
       "broadcastGroupMessage",
-      (groupId: string, userId: string, data: any) => {
-        this.sendGroupMessage(groupId, userId, data);
+      (groupId: string, message: any, messageAuthorId: string) => {
+        this.sendGroupMessage(groupId, message, messageAuthorId);
       },
     );
 
-    console.log(
-      `WebSocket server started..`,
-    );
+    console.log(`WebSocket server started..`);
   }
 
   private joinGroup(groupId: string, ws: WebSocket) {
-    if (!this.groupRooms.has(groupId)) {
-      this.groupRooms.set(groupId, new GroupRoom());
-      console.log(`Group ${groupId} created.`);
+    const [groupUID, userUID] = groupId.split("__");
+    if (!this.groupRooms.has(groupUID)) {
+      this.groupRooms.set(groupUID, new GroupRoom(groupUID));
     }
-
-    // Assuming the user's ID is part of the message or can be determined
-    const userId = ws["userId"]; // Retrieve the userId from the WebSocket context if needed
-    this.groupRooms.get(groupId)!.join(userId, ws);
+    this.groupRooms.get(groupUID).join(userUID, ws);
   }
 
   private leaveGroup(groupId: string, ws: WebSocket) {
-    const groupRoom = this.groupRooms.get(groupId);
-    if (groupRoom) {
-      groupRoom.leave(ws); // Implement leave logic in GroupRoom
-    }
+    const [groupUID, userUID] = groupId.split("__");
+    this.groupRooms.get(groupUID)?.leave(userUID);
   }
 
-  private sendGroupMessage(groupId: string, userId: string, data: any) {
-    const groupRoom = this.groupRooms.get(groupId);
-    if (groupRoom) {
-      groupRoom.broadcast({ userId, data }, userId);
-    } else {
-      console.log(`Group ${groupId} not found.`);
-    }
+  private sendGroupMessage(
+    groupId: string,
+    message: any,
+    messageAuthorId: string,
+  ) {
+    this.groupRooms.get(groupId)?.broadcast(messageAuthorId, message);
   }
 }
