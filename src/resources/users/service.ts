@@ -4,10 +4,10 @@ import { PrismaCrudMixin } from "../../plugins/databases/prisma-crud";
 import { CryptoService } from "../../plugins/utils/crypto-service";
 
 export class UserService extends PrismaCrudMixin<User> {
-
-  constructor(private db: PrismaClient = PrismaService.getInstance(),
-              private cryptoService = new CryptoService()
-             ) {
+  constructor(
+    private db: PrismaClient = PrismaService.getInstance(),
+    private cryptoService = new CryptoService(),
+  ) {
     super();
     this.setModel(this.db.user);
   }
@@ -18,22 +18,22 @@ export class UserService extends PrismaCrudMixin<User> {
       data: {
         username,
         password: hashedPassword,
-        email
-      }
+        email,
+      },
     });
   }
 
-  async signin(username: string, password: string){
+  async signin(username: string, password: string) {
     const user = await this.get<Partial<User>>({
-      username
+      username,
     });
-    if(!user) throw new Error(`error login`);
+    if (!user) throw new Error(`error login`);
 
     const decryptedPassword = this.cryptoService.decrypt(user.password);
-    if(decryptedPassword === password) return user;
+    if (decryptedPassword === password) return user;
     throw new Error(`error login`);
   }
-  
+
   async getUser(username: string) {
     return this.db.user.findFirst({
       where: {

@@ -10,7 +10,7 @@ import {
 import { UserService } from "./service";
 
 @ObjectType()
-class UserType {
+export class UserType {
   @Field()
   id: string;
 

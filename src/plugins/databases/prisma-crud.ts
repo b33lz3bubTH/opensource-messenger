@@ -11,9 +11,8 @@ interface OrderBy<Fields> {
 }
 
 export class PrismaCrudMixin<ModelType> {
-  protected model: any;
 
-  constructor() {}
+  constructor(protected model: any = null) {}
 
   protected setModel(model: any) {
     this.model = model;

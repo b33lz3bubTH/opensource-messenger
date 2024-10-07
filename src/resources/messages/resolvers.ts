@@ -1,8 +1,4 @@
-import {
-  MessageType,
-  MessageMeta,
-  MessageMetaType,
-} from "@prisma/client";
+import { MessageType, MessageMeta, MessageMetaType } from "@prisma/client";
 import {
   Resolver,
   Query,
@@ -14,6 +10,8 @@ import {
   Int,
   InputType,
 } from "type-graphql";
+
+import { UserType as GqlUserType } from "../users/resolvers";
 
 import { MessageService } from "./service";
 
@@ -88,6 +86,15 @@ class PaginatedMessageResponse {
 @Resolver(GqlMessageType)
 export class MessageResolver {
   private messageService = new MessageService();
+
+  @Query(() => [GqlUserType])
+  async getConnectedUsers(
+    @Arg("userId") userId: string,
+    @Arg("take", () => Int, { defaultValue: 10 }) take: number,
+    @Arg("skip", () => Int, { defaultValue: 0 }) skip: number,
+  ): Promise<GqlUserType[]> {
+    return this.messageService.usersMessageNetwork(userId, take, skip);
+  }
 
   @Mutation(() => GqlMessageType)
   async sendMessage(

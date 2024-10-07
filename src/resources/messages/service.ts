@@ -54,6 +54,42 @@ export class MessageService extends PrismaCrudMixin<Message> {
     ]);
   }
 
+  async usersMessageNetwork(
+    userId: string,
+    take: number = 10,
+    skip: number = 0,
+  ): Promise<User[]> {
+    const knownUserMessages = await (
+      this.model as typeof this.db.message
+    ).findMany({
+      where: {
+        OR: [
+          { senderId: userId, type: "direct" }, // Messages sent by the user
+          { recipient: userId, type: "direct" }, // Messages received by the user
+        ],
+      },
+      orderBy: [{ createdAt: "desc" }],
+    });
+
+    const connectedUserIds = new Set<string>();
+    knownUserMessages.forEach((message) => {
+      connectedUserIds.add(message.senderId);
+      connectedUserIds.add(message.recipient);
+    });
+
+    connectedUserIds.delete(userId);
+    const userIds = Array.from(connectedUserIds);
+
+    // todo: fix it later to use the userService class
+    return this.db.user.findMany({
+      where: {
+        id: {
+          in: userIds,
+        },
+      },
+    });
+  }
+
   async sendMessage(
     message: string,
     senderUsername: string,
@@ -64,6 +100,8 @@ export class MessageService extends PrismaCrudMixin<Message> {
     const sender = await this.userService.get<Partial<User>>({
       username: senderUsername,
     });
+
+    type check = typeof this.db.message;
 
     const newMessage = await (this.model as typeof this.db.message).create({
       data: {
