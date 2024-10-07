@@ -3,18 +3,24 @@ import { AuthModal } from "./component/auth/auth";
 
 import "./App.css";
 import { useAuth } from "./states/auth";
+import { Homepage } from "./pages/homepage";
 
 function App() {
   const { auth } = useAuth();
   const [modalState, setModalState] = useState(false);
+
   useEffect(() => {
     setModalState(!auth.isLoggedIn);
   }, [auth]);
+
   return (
-    <AuthModal
-      modalState={modalState}
-      changeModalState={(newState: boolean) => setModalState(newState)}
-    />
+    <div className="w-100">
+      <AuthModal
+        modalState={modalState}
+        changeModalState={(newState: boolean) => setModalState(newState)}
+      />
+      <Homepage />
+    </div>
   );
 }
 
