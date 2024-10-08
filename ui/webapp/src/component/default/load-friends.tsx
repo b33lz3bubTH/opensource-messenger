@@ -4,6 +4,10 @@ import { Menu, Avatar } from "antd";
 import { useAuth } from "../../states/auth";
 import { wordWrap } from "../../utils/utils";
 import { Loader } from "./loader";
+import {
+  useMessageLoader,
+  type messsageType,
+} from "../../states/message-box-state";
 
 interface IUser {
   id: string;
@@ -22,7 +26,7 @@ interface IGroup {
 
 export function FriendsAndGroupsList() {
   const { auth } = useAuth();
-
+  const { setUserList, loadMessage } = useMessageLoader();
   const Q_FLIST_FETCH = gql`
     query GetUsersFriendList($userId: String!) {
       getConnectedUsers(userId: $userId) {
@@ -74,7 +78,16 @@ export function FriendsAndGroupsList() {
 
   useEffect(() => {
     if (friendListData?.getConnectedUsers) {
-      setFList(friendListData.getConnectedUsers as IUser[]);
+      const data = friendListData?.getConnectedUsers as IUser[];
+
+      const userMapper: Map<string, { username: string; email: string }> =
+        new Map();
+      for (const user of data) {
+        userMapper.set(user.id, { username: user.username, email: user.email });
+      }
+      userMapper.set(auth.id, { username: auth.username, email: auth.email });
+      setUserList(userMapper);
+      setFList(data);
     }
   }, [friendListData]);
 
@@ -86,15 +99,24 @@ export function FriendsAndGroupsList() {
 
   return (
     <div className="w-100" style={{ minHeight: "45vh" }}>
-      <p className="h4 border-bottom text-center">Friends and Groups</p>
+      <p className="h4 border-bottom text-center p-2">Friends and Groups</p>
       {(loadingFLD || loadingGLD) && <Loader />}
       <Menu
+        className="my-2"
         mode="inline"
         style={{ minHeight: "45vh", overflow: "auto" }}
-        onClick={(e) => console.log(e)}
+        onClick={(e) => {
+          console.log(e.keyPath);
+          const [recipient, typeOfClick] = e.keyPath;
+          loadMessage({
+            messageType: typeOfClick as messsageType,
+            recipient,
+            senderId: auth.id,
+          });
+        }}
       >
         {/* Friends Submenu */}
-        <Menu.SubMenu key="friends" title="Friends">
+        <Menu.SubMenu key="users" title="Friends">
           {userFList
             .map((user) => {
               return {

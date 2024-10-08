@@ -1,6 +1,7 @@
 import { Navbar } from "../component/default/navbar";
 import { FriendsAndGroupsList } from "../component/default/load-friends";
 import { useAuth } from "../states/auth";
+import { MessageBox } from "../component/default/message-box";
 
 export function Homepage() {
   const { auth } = useAuth();
@@ -18,7 +19,9 @@ export function Homepage() {
             <div className="col-md-3">
               <FriendsAndGroupsList />
             </div>
-            <div className="col-md-9"></div>
+            <div className="col-md-9">
+              <MessageBox />
+            </div>
           </div>
         </div>
       )}
