@@ -148,6 +148,20 @@ export function MessageBox() {
     }
   }, [renderMessages]);
 
+  if (loader.messageType === "none") {
+    return (
+      <div className="w-100 border rounded p-2" style={{ height: "80vh" }}>
+        <h1 className="text-center h1 rainbow-text mt-5">
+          Hello, {auth.username}
+        </h1>
+
+        <p className="h5 text-center">
+          DM your friends, or Chat in Group. power of opensource.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-100 d-flex flex-column">
       <div

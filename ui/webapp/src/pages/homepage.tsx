@@ -10,16 +10,11 @@ export function Homepage() {
       <Navbar />
       {auth.isLoggedIn && (
         <div className="container-fluid">
-          <p className="initialism text-center">
-            Welcome <mark>{auth.username}</mark>, your <mark>{auth.email}</mark>
-            .
-          </p>
-
           <div className="row">
             <div className="col-md-3">
               <FriendsAndGroupsList />
             </div>
-            <div className="col-md-9">
+            <div className="col-md-9 my-5">
               <MessageBox />
             </div>
           </div>

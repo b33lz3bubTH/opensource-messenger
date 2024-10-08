@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { Menu, Avatar } from "antd";
 import { useAuth } from "../../states/auth";
-import { wordWrap } from "../../utils/utils";
+import { wordWrap, trimId } from "../../utils/utils";
 import { Loader } from "./loader";
 import {
   useMessageLoader,
@@ -128,7 +128,7 @@ export function FriendsAndGroupsList() {
                     {user.username.charAt(0).toUpperCase()}
                   </Avatar>
                 ),
-                label: wordWrap(`${user.username} #${user.id}`, 20),
+                label: wordWrap(`${user.username} #${trimId(user.id)}`, 20),
               };
             })
             .map((item) => (

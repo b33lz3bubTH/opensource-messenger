@@ -56,5 +56,8 @@ export function formatDiscordTime(date: Date): string {
 const baseUrl = `localhost:4000`;
 export const WebsocketApi = {
   GroupJoin: (groupId: string, userId: string) =>
-    `ws://${baseUrl}/group/${groupId}__${userId}`
+    `ws://${baseUrl}/group/${groupId}__${userId}`,
+
+  DmListner: (userId: string) =>
+    `ws://${baseUrl}/users/${userId}`
 }
