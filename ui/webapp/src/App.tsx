@@ -12,13 +12,13 @@ import { IMessage, useMessageLoader } from "./states/message-box-state";
 function App() {
   const [api, contextHolder] = notification.useNotification();
   const { auth } = useAuth();
-  const { usersList } = useMessageLoader();
+  const { usersList, loader, appendRenderMessages } = useMessageLoader();
+  
   const [modalState, setModalState] = useState(false);
 
   useEffect(() => {
     if (auth.isLoggedIn) {
       setModalState(!auth.isLoggedIn);
-      // websocket connection for dm's
     }
   }, [auth]);
 
@@ -32,6 +32,12 @@ function App() {
     socket.addEventListener("message", (event) => {
       const notification = JSON.parse(event.data) as IMessage;
       const whoSoEverSending = usersList.get(notification.senderId);
+
+      if(loader.messageType === "users" && loader.recipient === notification.senderId){
+        appendRenderMessages(notification);
+        return;
+      }
+      
       api.info({
         message: `By - ${whoSoEverSending?.username ?? trimId(notification.senderId)}`,
         description: wordWrap(notification.body, 70),
@@ -45,7 +51,7 @@ function App() {
       socket.close();
       console.log("WebSocket connection closed");
     };
-  }, [usersList]);
+  }, [usersList, loader]);
 
   return (
     <div className="w-100">

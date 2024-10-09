@@ -37,6 +37,30 @@ export function MessageBox() {
     }
   `;
 
+  const Q_U_MESSAGE = gql`
+    query GetMessagesBetween($recipient: String!, $senderId: String!) {
+      getMessagesBetween(
+        recipient: $recipient
+        senderId: $senderId
+        take: 200
+        skip: 0
+      ) {
+        data {
+          body
+          meta {
+            messageMetaType
+            refId
+            title
+          }
+          senderId
+          type
+          recipient
+          createdAt
+        }
+      }
+    }
+  `;
+
   const M_G_MESSAGE = gql`
     mutation SendMessageToAGroup(
       $messageBody: String!
@@ -69,6 +93,17 @@ export function MessageBox() {
       error: errorGroupMessages,
     },
   ] = useLazyQuery(Q_G_MESSAGE, {
+    fetchPolicy: "network-only",
+  });
+
+  const [
+    uMessageQuery,
+    {
+      data: userMessaages,
+      loading: lodingUserMessages,
+      error: errorUserMessages,
+    },
+  ] = useLazyQuery(Q_U_MESSAGE, {
     fetchPolicy: "network-only",
   });
 
@@ -120,6 +155,13 @@ export function MessageBox() {
         socket.close();
         console.log("WebSocket connection closed");
       };
+    } else if (loader.messageType === "users") {
+      uMessageQuery({
+        variables: {
+          recipient: loader.recipient,
+          senderId: auth.id,
+        },
+      });
     }
   }, [loader]);
 
@@ -142,6 +184,13 @@ export function MessageBox() {
   }, [groupMessaages]);
 
   useEffect(() => {
+    if (userMessaages?.getMessagesBetween?.data) {
+      const data = userMessaages?.getMessagesBetween?.data as IMessage[];
+      setRenderMessages([...data].reverse());
+    }
+  }, [userMessaages]);
+
+  useEffect(() => {
     if (messageSectionRef.current) {
       messageSectionRef.current.scrollTop =
         messageSectionRef.current.scrollHeight;
@@ -150,14 +199,34 @@ export function MessageBox() {
 
   if (loader.messageType === "none") {
     return (
-      <div className="w-100 border rounded p-2" style={{ height: "80vh" }}>
+      <div
+        className="d-flex flex-column justify-content-center align-items-center w-100 border m-auto rounded p-2"
+        style={{ height: "80vh" }}
+      >
         <h1 className="text-center h1 rainbow-text mt-5">
           Hello, {auth.username}
         </h1>
 
-        <p className="h5 text-center">
-          DM your friends, or Chat in Group. power of opensource.
+        <p className="h5 text-center w-50 mt-3">
+          Privacy isn't a privilege; it's a fundamental right. Our messaging app
+          puts you back in control—open-source, secure, and built for
+          transparency.
         </p>
+
+        <span
+          className="text-muted text-center w-50 mt-2"
+          style={{ fontSize: "0.7em" }}
+        >
+          Our open-source messaging app is designed with privacy as its core
+          principle. Built on secure, transparent protocols, it ensures that
+          your conversations remain truly private. With no hidden algorithms or
+          closed systems, the app offers full control over your data while
+          giving the global developer community the power to audit and improve
+          its security. Whether you're chatting with friends or working on
+          sensitive projects, our app guarantees end-to-end encryption and zero
+          compromise on privacy. Stay connected, stay secure—because your
+          privacy matters.
+        </span>
       </div>
     );
   }

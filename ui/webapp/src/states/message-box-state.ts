@@ -44,15 +44,8 @@ export const useMessageLoader = create<MessageState>((set) => ({
   renderMessages: [],
   appendRenderMessages: (data: IMessage) =>
     set((state) => {
-      console.log(
-        `setting rendering messages: `,
-        state.renderMessages,
-        `new data: `,
-        data,
-      );
       return { ...state, renderMessages: [...state.renderMessages, data] };
     }),
-
   setRenderMessages: (data: IMessage[]) =>
     set((state) => ({ ...state, renderMessages: data })),
   setUserList: (data: Map<string, IUser>) =>
