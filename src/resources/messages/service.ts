@@ -68,7 +68,7 @@ export class MessageService extends PrismaCrudMixin<Message> {
           { recipient: userId, type: "direct" }, // Messages received by the user
         ],
       },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: "asc" }],
     });
 
     const connectedUserIds = new Set<string>();
